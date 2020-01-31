@@ -8,15 +8,18 @@ public class MoveCardBehaviour : MonoBehaviour
     private Vector3 m_LastDrag;
     public Vector3 m_SnapTo;
     private bool m_ShouldKillCard;
-    private float m_SnapSpeed=20;
+    private float m_SnapSpeed=5;
     private GameControllerBehaviourScript m_GameController;
     public bool m_WaitingForInteraction;
+    public bool m_Male = true;
+    public float m_BreathingSpeed;
 
     // Start is called before the first frame update
     void Start()
     {
         SetPosition(this.transform.position);
         m_GameController = GameObject.FindObjectOfType<GameControllerBehaviourScript>();
+        m_BreathingSpeed = (float)(1+0.5* m_GameController.m_Random.NextDouble());
         ReviveCard();
     }
 
@@ -34,7 +37,7 @@ public class MoveCardBehaviour : MonoBehaviour
 
     private void OnMouseDrag()
     {
-        Vector3 currentMouse = GetMouseWorldCoordinates(); Debug.Log("drag" + currentMouse);
+        Vector3 currentMouse = GetMouseWorldCoordinates(); 
         var delta = currentMouse - m_LastDrag;
         this.transform.position += new Vector3(delta.x, delta.y, 0);
         m_LastDrag = currentMouse;
@@ -59,11 +62,16 @@ public class MoveCardBehaviour : MonoBehaviour
     private void OnMouseDown()
     {
         m_LastDrag = GetMouseWorldCoordinates();
-        m_GameController.Beg();
+        m_GameController.Beg(m_Male);
     }
     // Update is called once per frame
     void Update()
     {
+        //breathing:
+        float breath = 1 + 0.01f * Mathf.Sin(Time.time * m_BreathingSpeed);
+        this.transform.localScale = new Vector3(breath, breath, this.transform.localScale.z) ;
+
+
         if (!Input.GetMouseButton(0))
         {
             var ratio = Screen.width / Screen.height;

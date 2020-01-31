@@ -8,7 +8,8 @@ public class GameControllerBehaviourScript : MonoBehaviour
 
     public GameObject m_PlayerCard;
     public List<GameObject> m_CardsInDeck;
-    public List<AudioClip> m_BegSound;
+    public List<AudioClip> m_MaleBeg;
+    public List<AudioClip> m_FeMaleBeg;
     // Start is called before the first frame update
     void Start()
     {
@@ -18,7 +19,11 @@ public class GameControllerBehaviourScript : MonoBehaviour
     private void SelectNextCards()
     {
         int xOffset = (m_CardsInDeck.Count>1) ?6:0;
-        
+        if (m_PlayerCard == null && m_CardsInDeck.Count>0)
+        {
+            //"you" card is being shown:
+            this.GetComponent<AudioSource>().PlayOneShot(m_EvilLaugh);
+        }
         for (var x = 0; x <= 1; x++)
         {
             var card = m_CardsInDeck[x];
@@ -32,11 +37,13 @@ public class GameControllerBehaviourScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-                
+        if (Input.GetKeyDown(KeyCode.Escape))
+            Application.Quit();
     }
 
     internal void CardWasKilled(MoveCardBehaviour cardBehavior)
     {
+        m_Kills++;
         m_CardsInDeck.Remove(cardBehavior.gameObject);
         //move remaining card off screen;
         if(m_CardsInDeck.Count==0 && m_PlayerCard != null)
@@ -50,22 +57,46 @@ public class GameControllerBehaviourScript : MonoBehaviour
         //insert the winning card in the end of the list:
         m_CardsInDeck.Add(winningCard);
 
-        StartCoroutine(ExecuteAfterTime(1f, () =>
+        StartCoroutine(ExecuteAfterTime(3f, () =>
         {
             SelectNextCards();
         }));
         
 
     }
-    System.Random m_Random = new System.Random();
-    public void Beg()
+    int m_Kills = 0;
+    public System.Random m_Random = new System.Random();
+    public  AudioClip m_EvilLaugh;
+
+    public void Beg(bool isMaleCharacter)
     {
-        var numCardsLeft = m_CardsInDeck.Count;
-        if (m_Random.Next(0,2)==1)
+        if (m_Kills<2)
         {
-            var randomSound = m_BegSound[m_Random.Next(0, m_BegSound.Count)];
-            var audioSource = this.GetComponent<AudioSource>();
-            audioSource.PlayOneShot(randomSound);
+            //do not play anything at first:
+            return;
+        }
+        if (m_PlayerCard == null)
+        {
+            //this is the player character
+        }
+        else
+        {
+            //this is an npc
+            var numCardsLeft = m_CardsInDeck.Count;
+            if (m_Random.Next(0, 3) <= 1)
+            {
+                //male or female?
+                var beggingSounds = isMaleCharacter ? m_MaleBeg : m_FeMaleBeg;
+                if (beggingSounds.Count > 0)
+                {
+                    //choose random begging sounds:
+                    var randomSound = beggingSounds[m_Random.Next(0, beggingSounds.Count)];
+                    var audioSource = this.GetComponent<AudioSource>();
+                    audioSource.PlayOneShot(randomSound);
+                    //do not repeat anything:
+                    beggingSounds.Remove(randomSound);
+                }
+            }
         }
         
     }
