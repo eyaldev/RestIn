@@ -40,6 +40,7 @@ public class MoveCardBehaviour : MonoBehaviour
         m_LastDrag = currentMouse;
     }
 
+
     private static Vector3 GetMouseWorldCoordinates()
     {
         return Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -58,6 +59,7 @@ public class MoveCardBehaviour : MonoBehaviour
     private void OnMouseDown()
     {
         m_LastDrag = GetMouseWorldCoordinates();
+        m_GameController.Beg();
     }
     // Update is called once per frame
     void Update()

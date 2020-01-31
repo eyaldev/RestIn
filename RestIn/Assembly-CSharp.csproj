@@ -63,6 +63,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\CameraTexture.cs" />
     <Compile Include="Assets\GameControllerBehaviourScript.cs" />
     <Compile Include="Assets\MoveCardBehaviour.cs" />
     <Reference Include="Unity.Timeline.Editor">
