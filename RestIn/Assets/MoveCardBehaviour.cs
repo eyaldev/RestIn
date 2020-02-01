@@ -8,7 +8,7 @@ public class MoveCardBehaviour : MonoBehaviour
     private Vector3 m_LastDrag;
     public Vector3 m_SnapTo;
     private bool m_ShouldKillCard;
-    private float m_SnapSpeed=5;
+    private float m_SnapSpeed=40;
     private GameControllerBehaviourScript m_GameController;
     public bool m_WaitingForInteraction;
     public bool m_Male = true;
