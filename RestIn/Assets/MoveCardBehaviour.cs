@@ -17,7 +17,7 @@ public class MoveCardBehaviour : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        SetPosition(this.transform.position);
+        //SetPosition(this.transform.position);
         m_GameController = GameObject.FindObjectOfType<GameControllerBehaviourScript>();
         m_BreathingSpeed = (float)(1+0.5* m_GameController.m_Random.NextDouble());
         ReviveCard();
@@ -77,11 +77,11 @@ public class MoveCardBehaviour : MonoBehaviour
             var ratio = Screen.width / Screen.height;
             if (!m_ShouldKillCard)
             {
-                if (Mathf.Abs(this.transform.position.y) > 0.8 * Camera.main.orthographicSize)
+                if (Mathf.Abs(this.transform.position.y) > 0.65 * Camera.main.orthographicSize)
                 {
                     m_ShouldKillCard = true;
                 }
-                if (Mathf.Abs(this.transform.position.x) > 0.8 * Camera.main.orthographicSize * ratio)
+                if (Mathf.Abs(this.transform.position.x) > 0.75 * Camera.main.orthographicSize * ratio)
                 {
                     m_ShouldKillCard = true;
                 }

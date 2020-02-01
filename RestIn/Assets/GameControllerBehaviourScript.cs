@@ -29,9 +29,9 @@ public class GameControllerBehaviourScript : MonoBehaviour
         {
             var card = m_CardsInDeck[x];
             var cardController = card.GetComponent<MoveCardBehaviour>();
-            cardController.SetPosition(new Vector3(((x * 2) - 1) * xOffset, 0, 0));
             cardController.ReviveCard();
             card.SetActive(true);
+            cardController.m_SnapTo = new Vector3(((x * 2) - 1) * xOffset, 0, 0);
         }
     }
 
@@ -61,7 +61,7 @@ public class GameControllerBehaviourScript : MonoBehaviour
             else
             {
                 //Start Game
-                StartCoroutine(ExecuteAfterTime(1f, () =>
+                StartCoroutine(ExecuteAfterTime(.5f, () =>
                 {
                     SelectNextCards();
                 }));
@@ -82,12 +82,12 @@ public class GameControllerBehaviourScript : MonoBehaviour
                 m_PlayerCard = null;
             }
             var winningCard = m_CardsInDeck[0];
-            winningCard.GetComponent<MoveCardBehaviour>().RemoveAndLive();
-            m_CardsInDeck.Remove(winningCard);
+            //winningCard.GetComponent<MoveCardBehaviour>().RemoveAndLive();
+            //m_CardsInDeck.Remove(winningCard);
             //insert the winning card in the end of the list:
-            m_CardsInDeck.Add(winningCard);
+            //m_CardsInDeck.Add(winningCard);
 
-            StartCoroutine(ExecuteAfterTime(3f, () =>
+            StartCoroutine(ExecuteAfterTime(1f, () =>
             {
                 SelectNextCards();
             }));
