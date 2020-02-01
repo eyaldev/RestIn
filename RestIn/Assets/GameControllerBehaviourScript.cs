@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class GameControllerBehaviourScript : MonoBehaviour
 {
-
+    public GameObject m_CreditsCard;
     public GameObject m_PlayerCard;
     public List<GameObject> m_TutorialCards;
     public List<GameObject> m_CardsInDeck;
@@ -20,10 +20,21 @@ public class GameControllerBehaviourScript : MonoBehaviour
     private void SelectNextCards()
     {
         int xOffset = (m_CardsInDeck.Count > 1) ? 6 : 0;
-        if (m_PlayerCard == null && m_CardsInDeck.Count > 0)
+        if (m_PlayerCard == null && m_CreditsCard !=null && m_CardsInDeck.Count > 0)
         {
             //"you" card is being shown:
-            this.GetComponent<AudioSource>().PlayOneShot(m_EvilLaugh);
+            StartCoroutine(ExecuteAfterTime(1.5f, () =>
+            {
+                this.GetComponent<AudioSource>().PlayOneShot(m_LastWords);
+            }));
+        }
+        if (m_PlayerCard == null && m_CreditsCard == null )
+        {
+            //"credits" card is being shown:
+            StartCoroutine(ExecuteAfterTime(3f, () =>
+            {
+                this.GetComponent<AudioSource>().PlayOneShot(m_CreditSound);
+            }));
         }
         for (var x = 0; x <= 1; x++)
         {
@@ -71,6 +82,13 @@ public class GameControllerBehaviourScript : MonoBehaviour
 
     private void HandleCharacterCards(MoveCardBehaviour cardBehavior)
     {
+
+        if (m_PlayerCard == null)
+        {
+            //"you" card is being shown:
+            this.GetComponent<AudioSource>().PlayOneShot(m_EvilLaugh);
+        }
+
         if (m_CardsInDeck.Contains(cardBehavior.gameObject))
         {
             m_Kills++;
@@ -80,6 +98,11 @@ public class GameControllerBehaviourScript : MonoBehaviour
             {
                 m_CardsInDeck.Add(m_PlayerCard);
                 m_PlayerCard = null;
+            }
+            if (m_CardsInDeck.Count == 0 && m_PlayerCard == null && m_CreditsCard!=null)
+            {
+                m_CardsInDeck.Add(m_CreditsCard);
+                m_CreditsCard = null;
             }
             var winningCard = m_CardsInDeck[0];
             //winningCard.GetComponent<MoveCardBehaviour>().RemoveAndLive();
@@ -92,11 +115,14 @@ public class GameControllerBehaviourScript : MonoBehaviour
                 SelectNextCards();
             }));
         }
+
     }
 
     int m_Kills = 0;
     public System.Random m_Random = new System.Random();
+    public AudioClip m_LastWords;
     public AudioClip m_EvilLaugh;
+    public AudioClip m_CreditSound;
 
     public void Beg(bool isMaleCharacter)
     {
@@ -113,19 +139,16 @@ public class GameControllerBehaviourScript : MonoBehaviour
         {
             //this is an npc
             var numCardsLeft = m_CardsInDeck.Count;
-            if (m_Random.Next(0, 3) <= 1)
+            //male or female?
+            var beggingSounds = isMaleCharacter ? m_MaleBeg : m_FeMaleBeg;
+            if (beggingSounds.Count > 0)
             {
-                //male or female?
-                var beggingSounds = isMaleCharacter ? m_MaleBeg : m_FeMaleBeg;
-                if (beggingSounds.Count > 0)
-                {
-                    //choose random begging sounds:
-                    var randomSound = beggingSounds[m_Random.Next(0, beggingSounds.Count)];
-                    var audioSource = this.GetComponent<AudioSource>();
-                    audioSource.PlayOneShot(randomSound);
-                    //do not repeat anything:
-                    beggingSounds.Remove(randomSound);
-                }
+                //choose random begging sounds:
+                var randomSound = beggingSounds[m_Random.Next(0, beggingSounds.Count)];
+                var audioSource = this.GetComponent<AudioSource>();
+                audioSource.PlayOneShot(randomSound);
+                //do not repeat anything:
+                beggingSounds.Remove(randomSound);
             }
         }
 
