@@ -10,6 +10,11 @@ public class QuitOnClick : MonoBehaviour
         
     }
 
+    private void OnMouseUpAsButton()
+    {
+        Application.Quit();
+    }
+
     // Update is called once per frame
     void Update()
     {

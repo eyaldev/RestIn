@@ -7,19 +7,20 @@ public class GameControllerBehaviourScript : MonoBehaviour
 {
 
     public GameObject m_PlayerCard;
+    public List<GameObject> m_TutorialCards;
     public List<GameObject> m_CardsInDeck;
     public List<AudioClip> m_MaleBeg;
     public List<AudioClip> m_FeMaleBeg;
     // Start is called before the first frame update
     void Start()
     {
-        SelectNextCards();
+        //SelectNextCards();
     }
 
     private void SelectNextCards()
     {
-        int xOffset = (m_CardsInDeck.Count>1) ?6:0;
-        if (m_PlayerCard == null && m_CardsInDeck.Count>0)
+        int xOffset = (m_CardsInDeck.Count > 1) ? 6 : 0;
+        if (m_PlayerCard == null && m_CardsInDeck.Count > 0)
         {
             //"you" card is being shown:
             this.GetComponent<AudioSource>().PlayOneShot(m_EvilLaugh);
@@ -28,7 +29,7 @@ public class GameControllerBehaviourScript : MonoBehaviour
         {
             var card = m_CardsInDeck[x];
             var cardController = card.GetComponent<MoveCardBehaviour>();
-            cardController.SetPosition(new Vector3( ( (x*2)-1) * xOffset, 0, 0));
+            cardController.SetPosition(new Vector3(((x * 2) - 1) * xOffset, 0, 0));
             cardController.ReviveCard();
             card.SetActive(true);
         }
@@ -43,34 +44,63 @@ public class GameControllerBehaviourScript : MonoBehaviour
 
     internal void CardWasKilled(MoveCardBehaviour cardBehavior)
     {
-        m_Kills++;
-        m_CardsInDeck.Remove(cardBehavior.gameObject);
-        //move remaining card off screen;
-        if(m_CardsInDeck.Count==0 && m_PlayerCard != null)
-        {
-            m_CardsInDeck.Add(m_PlayerCard);
-            m_PlayerCard = null;
-        }
-        var winningCard = m_CardsInDeck[0];
-        winningCard.GetComponent<MoveCardBehaviour>().RemoveAndLive();
-        m_CardsInDeck.Remove(winningCard);
-        //insert the winning card in the end of the list:
-        m_CardsInDeck.Add(winningCard);
-
-        StartCoroutine(ExecuteAfterTime(3f, () =>
-        {
-            SelectNextCards();
-        }));
-        
-
+        HandleTutorialCards(cardBehavior);
+        HandleCharacterCards(cardBehavior);
     }
+
+    private void HandleTutorialCards(MoveCardBehaviour cardBehavior)
+    {
+        if (m_TutorialCards.Contains(cardBehavior.gameObject))
+        {
+            m_TutorialCards.Remove(cardBehavior.gameObject);
+            if (m_TutorialCards.Count > 0)
+            {
+                m_TutorialCards[0].gameObject.SetActive(true);
+
+            }
+            else
+            {
+                //Start Game
+                StartCoroutine(ExecuteAfterTime(1f, () =>
+                {
+                    SelectNextCards();
+                }));
+            }
+        }
+    }
+
+    private void HandleCharacterCards(MoveCardBehaviour cardBehavior)
+    {
+        if (m_CardsInDeck.Contains(cardBehavior.gameObject))
+        {
+            m_Kills++;
+            m_CardsInDeck.Remove(cardBehavior.gameObject);
+            //move remaining card off screen;
+            if (m_CardsInDeck.Count == 0 && m_PlayerCard != null)
+            {
+                m_CardsInDeck.Add(m_PlayerCard);
+                m_PlayerCard = null;
+            }
+            var winningCard = m_CardsInDeck[0];
+            winningCard.GetComponent<MoveCardBehaviour>().RemoveAndLive();
+            m_CardsInDeck.Remove(winningCard);
+            //insert the winning card in the end of the list:
+            m_CardsInDeck.Add(winningCard);
+
+            StartCoroutine(ExecuteAfterTime(3f, () =>
+            {
+                SelectNextCards();
+            }));
+        }
+    }
+
     int m_Kills = 0;
     public System.Random m_Random = new System.Random();
-    public  AudioClip m_EvilLaugh;
+    public AudioClip m_EvilLaugh;
 
     public void Beg(bool isMaleCharacter)
     {
-        if (m_Kills<2)
+        if (m_Kills < 2)
         {
             //do not play anything at first:
             return;
@@ -98,7 +128,7 @@ public class GameControllerBehaviourScript : MonoBehaviour
                 }
             }
         }
-        
+
     }
 
     IEnumerator ExecuteAfterTime(float time, Action task)
